@@ -1,19 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
     getProxyData();
     checkIfSiteAdded();
-    loadTabs();
 });
-
-function loadTabs(){
-    const tabs1 = new GraphTabs('tab');
-}
 
 function checkIfSiteAdded(){
     var elementToStart = document.getElementById("siteEnabling");
     chrome.storage.sync.get('domain_list', function(domain_list){
         if (!domain_list.domain_list){
-            elementToStart.innerHTML += '<button id="enableSite">Enable on this site</button>';
-            document.getElementById("enableSite").addEventListener("click", enableSite);
+            elementToStart.innerHTML += `
+                <button id="enableSite" class="turn-btn" onclick="enableSite()">
+                    <svg>
+                        <use xlink:href="#turn-button"></use>
+                    </svg>
+                </button>
+            `;
             return;
         }
 
@@ -28,13 +28,22 @@ function checkIfSiteAdded(){
 
             if (domain_list.domain_list.indexOf(domain) == -1){
 
-                elementToStart.innerHTML += '<button id="enableSite">Enable on this site</button>';
-                document.getElementById("enableSite").addEventListener("click", enableSite);
+                elementToStart.innerHTML += `
+                    <button id="enableSite" class="turn-btn" onclick="enableSite()">
+                        <svg>
+                            <use xlink:href="#turn-button"></use>
+                        </svg>
+                    </button>
+                `;
                 return;
             }
 
-            elementToStart.innerHTML += '<button id="disableSite">Disable on this site</button>';
-            document.getElementById('disableSite').addEventListener("click", disableSite);
+            elementToStart.innerHTML += `
+                <button id="disableSite" class="turn-btn" onclick="disableSite()"><svg>
+                    <use xlink:href="#turn-button"></use>
+                    </svg>
+                </button>
+            `;
         });
     });
 }
@@ -43,30 +52,36 @@ function getProxyData() {
     var proxyDataElement = document.getElementById('proxyData');
     chrome.storage.sync.get("proxy", function(data){
         if (data.proxy){
-            var html_to_add = `<p class="fs-6 fw-normal mb-1">Ip: ${data.proxy.ip}</p>\n`+
-                        `<p class="fs-6 fw-normal mb-1">Port: ${data.proxy.port}</p>\n`+
-                        `<p class="fs-6 fw-normal mb-1">Username: ${data.proxy.username}</p>\n`+
-                        `<p class="fs-6 fw-normal mb-1">Password: ${data.proxy.password}</p>\n`+
-                        `<button id="changeProxy" type="button" class="btn btn-outline-primary">Change proxy</button>`;
-            proxyDataElement.innerHTML += html_to_add;
+            proxyDataElement.innerHTML += `
+                <div class="d-flex flex-column">
+                    <p class="fs-4 fw-normal mb-1"><span class="fw-bold">Ip:</span> ${data.proxy.ip}</p>
+                    <p class="fs-4 fw-normal mb-1"><span class="fw-bold">Port:</span> ${data.proxy.port}</p>
+                    <p class="fs-4 fw-normal mb-1"><span class="fw-bold">Username:</span> ${data.proxy.username}</p>
+                    <p class="fs-4 fw-normal mb-1"><span class="fw-bold">Password:</span> ${data.proxy.password}</p>
+                    <button id="changeProxy" type="button" class="btn btn-outline-primary border-2 mt-2">Change proxy</button>
+                </div>
+            `;
             document.getElementById("changeProxy").addEventListener("click", changeProxy);
         }
         else{
-            var html_to_add = `<h2>Proxy adding</h2>\n
-
-                <input type="text" id="proxyIP" placeholder="IP">\n
-
-                <input type="text" id="proxyPort" placeholder="Port">\n
-
-                <input type="text" id="proxyUsername" placeholder="Login">\n
-                
-                <input type="text" id="proxyPassword" placeholder="Password">\n
-
-                <button id="applyProxy" type="button" class="btn btn-primary">Apply Proxy</button>\n
-                <p>Or you can visit this site <a href="proxy6.net/user/proxy">proxy6.net</a>\n
-                If you have proxy there, push button below</p>\n
-                <button id="autoDetectProxy">Auto detect</button>`;
-            proxyDataElement.innerHTML += html_to_add;
+            proxyDataElement.innerHTML += `
+                <div class="d-flex flex-column w-100">
+                    <h2 class="fs-4 text-center">Proxy adding</h2>
+                    <input class="form-control mb-2" type="text" id="proxyIP" placeholder="IP">
+                    <input class="form-control mb-2" type="text" id="proxyPort" placeholder="Port">
+                    <input class="form-control mb-2" type="text" id="proxyUsername" placeholder="Login">
+                    <input class="form-control mb-2" type="text" id="proxyPassword" placeholder="Password">
+                    <button id="applyProxy" type="button" class="btn btn-primary w-100">Apply Proxy</button>
+                    <span class="d-block fs-6 mt-2 d-flex align-items-center">
+                        <span title="Or you can visit this site proxy6.net If you have proxy there, push button below" class="me-1">
+                            <svg class="question-svg">
+                                <use xlink:href="#question"></use>
+                            </svg>
+                        </span>
+                        <span class="text-decoration-underline text-primary">Auto detect</span>
+                    </span>
+                </div>
+            `;
             document.getElementById("applyProxy").addEventListener("click", applyProxy);
         }
         
@@ -154,3 +169,6 @@ function disableSite(){
         chrome.runtime.sendMessage({ action: 'disableSite', domain: domain });
     });
 }
+
+window.enableSite = enableSite;
+window.disableSite = disableSite;

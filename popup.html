@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>ProxyBy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="modules/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="modules/custom/index.css" rel="stylesheet">
@@ -10,24 +14,57 @@
     <script src="tabs.js" defer></script>
     <script src="popup.js" defer></script>
 </head>
-<body>
-    <div class="tabs text-center" data-tabs="tab">
-        <div class="d-flex">
 
-            <ul class="tabs__nav p-0 border border-end mb-0">
-                <li class="tabs__nav-item"><button class="tabs__nav-btn button-panel" type="button"><img height="32" width="32" src="images/settings-100.svg" alt=""></button></li>
-                <li class="tabs__nav-item"><button class="tabs__nav-btn button-panel" id="tab" type="button"><img height="32" width="32" src="images/working-64.png" alt=""></button></li>
-            </ul>
-
-            <div class="tabs__content">
-                <div class="tabs__panel">
-                    <span id="siteEnabling" class="fw-medium fs-5">Site enabling</span>
+<body class="d-flex">
+    <div class="d-flex tabs flex-column">
+        <div class="tabs__content w-100 h-100">
+            <div class="tabs__panel h-100 d-flex flex-column justify-content-center align-items-center first-tab">
+                <div id="siteEnabling"
+                    class="fw-medium fs-1 d-flex flex-column justify-content-center align-items-center">
+                    <strong>Site enabling</strong>
                 </div>
-                <div class="tabs__panel">
-                    <span id="proxyData" class="fw-medium fs-5 mb-2">My proxy data</span>
+            </div>
+            <div class="tabs__panel second-tab d-flex flex-column justify-content-center align-items-center">
+                <div id="proxyData" class="fw-medium fs-1 fw-bold d-flex flex-column w-100 h-100 align-items-center">
+                    <strong class="mb-2">My proxy data</strong>
                 </div>
             </div>
         </div>
+
+        <ul class="tabs__nav border-top mb-0 d-flex align-items-center p-0">
+            <li class="tabs__nav-item w-50 p-2">
+                <button
+                    class="tabs__nav-btn button-panel w-100 d-flex flex-column align-items-center justify-content-center"
+                    id="tab-1" type="button">
+                    <img height="35" width="35" src="images/settings-100.svg" alt="">
+                    <span>Settings</span>
+                </button>
+            </li>
+            <li class="tabs__nav-item w-50 border-start p-2">
+                <button
+                    class="tabs__nav-btn button-panel w-100 d-flex flex-column align-items-center justify-content-center"
+                    id="tab-2" type="button">
+                    <img height="35" width="35" src="images/working-64.png" alt="">
+                    <span>Proxy Data</span>
+                </button>
+            </li>
+        </ul>
     </div>
 </body>
+
+<svg style="display: none;">
+    <symbol id="turn-button" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v10" />
+        <path d="M18.4 6.6a9 9 0 1 1-12.77.04" />
+    </symbol>
+
+    <symbol id="question" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+        <path d="M12 17h.01" />
+    </symbol>
+</svg>
+
 </html>
