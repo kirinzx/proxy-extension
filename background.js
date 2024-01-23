@@ -1,18 +1,19 @@
-function provideCredentialsSync(requestDetails) {
-    chrome.storage.sync.get('proxy', function(data){
-        if (data){
+function provideCredentials(requestDetails, callback) {
+    chrome.storage.sync.get('proxy', function(data) {
+        if (data && data.proxy) {
             var credentials = {
-                username: data.proxy.username, 
+                username: data.proxy.username,
                 password: data.proxy.password
-            }
-            return { authCredentials: credentials };
+            };
+            callback({ authCredentials: credentials });
+        } else {
+            callback({});
         }
-    })
-    
+    });
 }
 
 chrome.webRequest.onAuthRequired.addListener(
-    provideCredentialsSync,
+    provideCredentials,
     { urls: ["<all_urls>"] },
     ["blocking"],
 );

@@ -1,0 +1,28 @@
+.tabs__panel {
+  display: none;
+}
+
+.tabs__nav {
+  list-style: none;
+}
+
+.tabs__panel--active {
+  display: block;
+}
+
+/* .tabs__nav-btn:focus {
+  color: white;
+}
+
+.tabs__nav-btn--active {
+  background-color: white;
+} */
+
+body {
+  width:300px;
+}
+
+.button-panel{
+  background: none;
+  border: none;
+}

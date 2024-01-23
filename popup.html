@@ -4,32 +4,30 @@
     <meta charset="UTF-8">
     <title>ProxyBy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="modules/css/bootstrap.min.css" rel="stylesheet">
-    <script src="modules/js/bootstrap.min.js" defer></script>
+    <link href="modules/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="modules/custom/index.css" rel="stylesheet">
+    <script src="modules/bootstrap/js/bootstrap.min.js" defer></script>
+    <script src="tabs.js" defer></script>
     <script src="popup.js" defer></script>
 </head>
 <body>
-    <div>
-        <h2>Proxy adding</h2>
+    <div class="tabs text-center" data-tabs="tab">
+        <div class="d-flex">
 
-        <input type="text" id="proxyIP" placeholder="IP">
+            <ul class="tabs__nav p-0 border border-end mb-0">
+                <li class="tabs__nav-item"><button class="tabs__nav-btn button-panel" type="button"><img height="32" width="32" src="images/settings-100.svg" alt=""></button></li>
+                <li class="tabs__nav-item"><button class="tabs__nav-btn button-panel" id="tab" type="button"><img height="32" width="32" src="images/working-64.png" alt=""></button></li>
+            </ul>
 
-        <input type="text" id="proxyPort" placeholder="Port">
-
-        <input type="text" id="proxyUsername" placeholder="Login">
-        
-        <input type="text" id="proxyPassword" placeholder="Password">
-
-        <button id="applyProxy">Apply Proxy</button>
-        <p>Or you can visit this site <a href="proxy6.net/user/proxy">proxy6.net</a>
-        If you have proxy there, push button below</p>
-        <button id="autoDetectProxy">Auto detect</button>
-    </div>
-    <div>
-        <h2 id="siteEnabling">Site enabling</h2>
-    </div>
-    <div>
-        <h2 id="proxyData">My proxy data</h2>
+            <div class="tabs__content">
+                <div class="tabs__panel">
+                    <span id="siteEnabling" class="fw-medium fs-5">Site enabling</span>
+                </div>
+                <div class="tabs__panel">
+                    <span id="proxyData" class="fw-medium fs-5 mb-2">My proxy data</span>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

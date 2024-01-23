@@ -1,14 +1,17 @@
-document.getElementById("applyProxy").addEventListener("click", applyProxy);
-
 document.addEventListener('DOMContentLoaded', function() {
     getProxyData();
     checkIfSiteAdded();
+    loadTabs();
 });
+
+function loadTabs(){
+    const tabs1 = new GraphTabs('tab');
+}
 
 function checkIfSiteAdded(){
     var elementToStart = document.getElementById("siteEnabling");
     chrome.storage.sync.get('domain_list', function(domain_list){
-        if (!domain_list){
+        if (!domain_list.domain_list){
             elementToStart.innerHTML += '<button id="enableSite">Enable on this site</button>';
             document.getElementById("enableSite").addEventListener("click", enableSite);
             return;
@@ -39,17 +42,39 @@ function checkIfSiteAdded(){
 function getProxyData() {
     var proxyDataElement = document.getElementById('proxyData');
     chrome.storage.sync.get("proxy", function(data){
-        if (data){
-            var html_to_add = `<p>Ip: ${data.proxy.ip}</p>\n`+
-                        `<p>Port: ${data.proxy.port}</p>\n`+
-                        `<p>Username: ${data.proxy.username}</p>\n`+
-                        `<p>Password: ${data.proxy.password}</p>\n`;
+        if (data.proxy){
+            var html_to_add = `<p class="fs-6 fw-normal mb-1">Ip: ${data.proxy.ip}</p>\n`+
+                        `<p class="fs-6 fw-normal mb-1">Port: ${data.proxy.port}</p>\n`+
+                        `<p class="fs-6 fw-normal mb-1">Username: ${data.proxy.username}</p>\n`+
+                        `<p class="fs-6 fw-normal mb-1">Password: ${data.proxy.password}</p>\n`+
+                        `<button id="changeProxy" type="button" class="btn btn-outline-primary">Change proxy</button>`;
+            proxyDataElement.innerHTML += html_to_add;
+            document.getElementById("changeProxy").addEventListener("click", changeProxy);
         }
         else{
-            var html_to_add = `<span>There's no proxy yet</span>`;
+            var html_to_add = `<h2>Proxy adding</h2>\n
+
+                <input type="text" id="proxyIP" placeholder="IP">\n
+
+                <input type="text" id="proxyPort" placeholder="Port">\n
+
+                <input type="text" id="proxyUsername" placeholder="Login">\n
+                
+                <input type="text" id="proxyPassword" placeholder="Password">\n
+
+                <button id="applyProxy" type="button" class="btn btn-primary">Apply Proxy</button>\n
+                <p>Or you can visit this site <a href="proxy6.net/user/proxy">proxy6.net</a>\n
+                If you have proxy there, push button below</p>\n
+                <button id="autoDetectProxy">Auto detect</button>`;
+            proxyDataElement.innerHTML += html_to_add;
+            document.getElementById("applyProxy").addEventListener("click", applyProxy);
         }
-        proxyDataElement.innerHTML += html_to_add;
+        
     });
+}
+
+
+function changeProxy(){
     
 }
 
