@@ -6,10 +6,12 @@
     "permissions": [
         "storage",
         "activeTab",
+        "scripting",
         "tabs",
         "proxy",
         "webRequest",
-        "webRequestAuthProvider"
+        "webRequestAuthProvider",
+        "webNavigation"
     ],
     "host_permissions": [
         "<all_urls>"
@@ -23,5 +25,16 @@
     },
     "background": {
         "service_worker": "background.js"
-    }
+    },
+    "content_scripts": [
+        {
+            "all_frames": true,
+            "matches": [
+                "https://proxy6.net/user/proxy"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ]
 }

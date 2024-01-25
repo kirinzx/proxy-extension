@@ -117,3 +117,12 @@ body {
   height: 25px;
   cursor: help;
 }
+
+#auto-detect-span{
+  cursor: pointer;
+}
+
+.no-click {
+  pointer-events: none;
+  opacity: 0.5;
+}

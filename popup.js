@@ -1,19 +1,18 @@
+import {regular_ip, proxyForm_html, getProxyDataHtml,disableSite_html,enableSite_html, getErrorHtml, non_clickable_html, getAutoDetectErrorHTML} from "./tools.js"
+
 document.addEventListener('DOMContentLoaded', function() {
     getProxyData();
     checkIfSiteAdded();
 });
 
 function checkIfSiteAdded(){
-    var elementToStart = document.getElementById("siteEnabling");
-    chrome.storage.sync.get('domain_list', function(domain_list){
-        if (!domain_list.domain_list){
-            elementToStart.innerHTML += `
-                <button id="enableSite" class="turn-btn" onclick="enableSite()">
-                    <svg>
-                        <use xlink:href="#turn-button"></use>
-                    </svg>
-                </button>
-            `;
+    chrome.storage.sync.get(['domain_list',"proxy"], function(data){
+        var is_clickable = true;
+        if (!data.proxy){
+            is_clickable = false;
+        }
+        if (!data.domain_list){
+            renderEnableSiteHTML(is_clickable);
             return;
         }
 
@@ -26,71 +25,53 @@ function checkIfSiteAdded(){
             domain = domain_splitted.pop()
             domain = "." + domain_splitted.pop() + "." + domain
 
-            if (domain_list.domain_list.indexOf(domain) == -1){
+            if (data.domain_list.indexOf(domain) == -1){
 
-                elementToStart.innerHTML += `
-                    <button id="enableSite" class="turn-btn" onclick="enableSite()">
-                        <svg>
-                            <use xlink:href="#turn-button"></use>
-                        </svg>
-                    </button>
-                `;
+                renderEnableSiteHTML(is_clickable);
                 return;
             }
 
-            elementToStart.innerHTML += `
-                <button id="disableSite" class="turn-btn" onclick="disableSite()"><svg>
-                    <use xlink:href="#turn-button"></use>
-                    </svg>
-                </button>
-            `;
+            renderDisableSiteHTML(is_clickable);
         });
     });
 }
 
 function getProxyData() {
-    var proxyDataElement = document.getElementById('proxyData');
     chrome.storage.sync.get("proxy", function(data){
         if (data.proxy){
-            proxyDataElement.innerHTML += `
-                <div class="d-flex flex-column">
-                    <p class="fs-4 fw-normal mb-1"><span class="fw-bold">Ip:</span> ${data.proxy.ip}</p>
-                    <p class="fs-4 fw-normal mb-1"><span class="fw-bold">Port:</span> ${data.proxy.port}</p>
-                    <p class="fs-4 fw-normal mb-1"><span class="fw-bold">Username:</span> ${data.proxy.username}</p>
-                    <p class="fs-4 fw-normal mb-1"><span class="fw-bold">Password:</span> ${data.proxy.password}</p>
-                    <button id="changeProxy" type="button" class="btn btn-outline-primary border-2 mt-2">Change proxy</button>
-                </div>
-            `;
-            document.getElementById("changeProxy").addEventListener("click", changeProxy);
+            renderProxyDataHTML(data.proxy);
         }
         else{
-            proxyDataElement.innerHTML += `
-                <div class="d-flex flex-column w-100">
-                    <h2 class="fs-4 text-center">Proxy adding</h2>
-                    <input class="form-control mb-2" type="text" id="proxyIP" placeholder="IP">
-                    <input class="form-control mb-2" type="text" id="proxyPort" placeholder="Port">
-                    <input class="form-control mb-2" type="text" id="proxyUsername" placeholder="Login">
-                    <input class="form-control mb-2" type="text" id="proxyPassword" placeholder="Password">
-                    <button id="applyProxy" type="button" class="btn btn-primary w-100">Apply Proxy</button>
-                    <span class="d-block fs-6 mt-2 d-flex align-items-center">
-                        <span title="Or you can visit this site proxy6.net If you have proxy there, push button below" class="me-1">
-                            <svg class="question-svg">
-                                <use xlink:href="#question"></use>
-                            </svg>
-                        </span>
-                        <span class="text-decoration-underline text-primary">Auto detect</span>
-                    </span>
-                </div>
-            `;
-            document.getElementById("applyProxy").addEventListener("click", applyProxy);
+            renderProxyFormHTML();
         }
-        
     });
 }
 
 
 function changeProxy(){
-    
+    renderProxyFormHTML();
+    deleteProxy();
+    removeAllDomains();
+    resetProxySettings();
+}
+
+function autoDetect(){
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, 
+                {
+                    message: "autoDetect",
+                }, function(response) {
+                    if (response.data.errors.length != 0){
+                        response.data.errors.forEach(element => {
+                            renderAutoDetectError(element);
+                        });
+                        return;
+                    }
+                    fillProxyForm(response.data.proxy);
+                }
+            )
+        }
+    )
 }
 
 function applyProxy() {
@@ -101,7 +82,8 @@ function applyProxy() {
         "password": document.getElementById('proxyPassword')
     }
     var validatedData = validateProxy(proxy);
-    if (!validatedData){
+
+    if (validatedData == false){
         return;
     }
     proxy.ip.value = '';
@@ -109,25 +91,48 @@ function applyProxy() {
     proxy.username.value = '';
     proxy.password.value = '';
     chrome.runtime.sendMessage({ action: 'applyProxy', proxy: validatedData });
+    var element = document.getElementById("proxy_form_div");
+    element.remove()  
+    renderProxyDataHTML(validatedData);
+    removeSiteEnablingError();
+}
+
+function deleteProxy(){
+    chrome.storage.sync.set({"proxy": null});
+}
+
+function removeAllDomains(){
+    chrome.storage.sync.set({"domain_list": []});
+}
+
+function resetProxySettings(){
+    chrome.runtime.sendMessage({ action: 'resetProxy'});
 }
 
 function validateProxy(proxy){
     var valid_flag = true;
 
-    if (!proxy.ip.value){
-        proxy.ip.insertAdjacentHTML("afterend","<p>Invalid IP</p>");
+    if (!regular_ip.test(proxy.ip.value)){
+        proxy.ip.classList.add("border-danger");
         valid_flag = false;
     }
-    if (!proxy.port.value){
-        proxy.port.insertAdjacentHTML("afterend","<p>Invalid Port</p>");
+    try{
+        if (!proxy.port.value || 0 >= parseInt(proxy.port.value) ||  parseInt(proxy.port.value) >= 65535){
+            proxy.port.classList.add("border-danger");
+            valid_flag = false;
+        }
+    }
+    catch (err){
+        proxy.port.classList.add("border-danger");
         valid_flag = false;
     }
+    
     if (!proxy.username.value){
-        proxy.username.insertAdjacentHTML("afterend","<p>Invalid Username</p>");
+        proxy.username.classList.add("border-danger");
         valid_flag = false;
     }
     if (!proxy.password.value){
-        proxy.password.insertAdjacentHTML("afterend","<p>Invalid Password</p>");
+        proxy.password.classList.add("border-danger");
         valid_flag = false;
     }
 
@@ -143,6 +148,19 @@ function validateProxy(proxy){
     return validated_proxy;
 }
 
+function fillProxyForm(proxy){
+    document.getElementById("proxyIP").value = proxy.ip;
+    document.getElementById("proxyPort").value = proxy.port;
+    document.getElementById("proxyUsername").value = proxy.username;
+    document.getElementById("proxyPassword").value = proxy.password;
+}
+
+
+function renderAutoDetectError(errorText){
+    var htmlToAdd = getAutoDetectErrorHTML(errorText);
+    document.getElementById("auto-detect-span").insertAdjacentHTML("afterend",htmlToAdd);
+}
+
 function enableSite(){
     chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
         var currentTab = tabs[0];
@@ -156,9 +174,6 @@ function enableSite(){
 }
 
 function disableSite(){
-    var proxy = chrome.storage.sync.get('proxy');
-
-    if (!proxy) return;
     chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
         var currentTab = tabs[0];
         var url = new URL(currentTab.url);
@@ -170,5 +185,45 @@ function disableSite(){
     });
 }
 
-window.enableSite = enableSite;
-window.disableSite = disableSite;
+function renderProxyDataHTML(proxy){
+    var proxyDataElement = document.getElementById('proxy-data');
+    proxyDataElement.replaceChildren()
+    proxyDataElement.innerHTML += getProxyDataHtml(proxy);
+    document.getElementById("changeProxy").addEventListener("click", changeProxy);
+}
+
+function renderProxyFormHTML(){
+    var proxyDataElement = document.getElementById('proxy-data');
+    proxyDataElement.replaceChildren()
+    proxyDataElement.innerHTML += proxyForm_html;
+    document.getElementById("applyProxy").addEventListener("click", applyProxy);
+    document.getElementById("auto-detect-span").addEventListener("click", autoDetect);
+}
+
+function renderEnableSiteHTML(is_clickable){
+    var elementToStart = document.getElementById("site-configuration");
+    elementToStart.replaceChildren();
+    elementToStart.innerHTML += enableSite_html;
+    var button = document.getElementById("enableSite");
+    button.addEventListener("click", enableSite)
+    if (!is_clickable){
+        button.classList.add("no-click");
+        button.insertAdjacentHTML("beforebegin",non_clickable_html);
+    }
+}
+
+function renderDisableSiteHTML(is_clickable){
+    var elementToStart = document.getElementById("site-configuration");
+    elementToStart.replaceChildren();
+    elementToStart.innerHTML += disableSite_html;
+    var button = document.getElementById("disableSite");
+    button.addEventListener("click", disableSite)
+    if (!is_clickable){
+       button.classList.add("no-click");
+       button.insertAdjacentHTML("beforebegin",non_clickable_html);
+    }
+}
+
+function removeSiteEnablingError(){
+    document.getElementById("site-enabling-error").remove()
+}

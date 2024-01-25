@@ -12,21 +12,20 @@
     <link href="modules/custom/index.css" rel="stylesheet">
     <script src="modules/bootstrap/js/bootstrap.min.js" defer></script>
     <script src="tabs.js" defer></script>
-    <script src="popup.js" defer></script>
+    <script src="popup.js" type="module" defer></script>
+    <script src="tools.js" type="module" defer></script>
 </head>
 
 <body class="d-flex">
     <div class="d-flex tabs flex-column">
         <div class="tabs__content w-100 h-100">
             <div class="tabs__panel h-100 d-flex flex-column justify-content-center align-items-center first-tab">
-                <div id="siteEnabling"
+                <div id="site-configuration"
                     class="fw-medium fs-1 d-flex flex-column justify-content-center align-items-center">
-                    <strong>Site enabling</strong>
                 </div>
             </div>
             <div class="tabs__panel second-tab d-flex flex-column justify-content-center align-items-center">
-                <div id="proxyData" class="fw-medium fs-1 fw-bold d-flex flex-column w-100 h-100 align-items-center">
-                    <strong class="mb-2">My proxy data</strong>
+                <div id="proxy-data" class="fw-medium fs-1 fw-bold d-flex flex-column w-100 h-100 align-items-center">
                 </div>
             </div>
         </div>
@@ -37,7 +36,7 @@
                     class="tabs__nav-btn button-panel w-100 d-flex flex-column align-items-center justify-content-center"
                     id="tab-1" type="button">
                     <img height="35" width="35" src="images/settings-100.svg" alt="">
-                    <span>Settings</span>
+                    <span>Configuration</span>
                 </button>
             </li>
             <li class="tabs__nav-item w-50 border-start p-2">
