@@ -1,5 +1,4 @@
 async function provideCredentials(details, callbackFn) {
-    console.log(1)
     var data = await chrome.storage.sync.get('proxy');
     if (data.proxy){
         var credentials = {
@@ -59,8 +58,6 @@ async function enableSite(domain) {
     }
 
     var domain_list = await chrome.storage.sync.get("domain_list");
-    console.log(domain_list)
-    console.log(domain)
     if (domain_list){
         domain_list = domain_list.domain_list
     }
@@ -89,7 +86,6 @@ async function updateProxy(domain_list){
         }
     }
     str_domain_list = str_domain_list + "];"
-    console.log(str_domain_list)
     var config = {
         mode: "pac_script",
         pacScript: {
@@ -106,7 +102,6 @@ async function updateProxy(domain_list){
                 `}`
         }
     };
-    console.log(config)
     await chrome.proxy.settings.set({ value: config, scope: 'regular' });
 }
 

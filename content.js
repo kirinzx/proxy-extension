@@ -3,7 +3,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         var dataToResponse = autoDetectProxy();
         sendResponse({data:dataToResponse});
     }
-    console.log(request)
 })
 
 function autoDetectProxy(){
