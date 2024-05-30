@@ -15,15 +15,12 @@ function checkIfSiteAdded(){
             renderEnableSiteHTML(is_clickable);
             return;
         }
-
+        
         chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
             var domain = '';
             var currentTab = tabs[0];
             var url = new URL(currentTab.url);
             domain = url.hostname;
-            var domain_splitted = domain.split(".")
-            domain = domain_splitted.pop()
-            domain = "." + domain_splitted.pop() + "." + domain
 
             if (data.domain_list.indexOf(domain) == -1){
 
@@ -166,10 +163,9 @@ function enableSite(){
         var currentTab = tabs[0];
         var url = new URL(currentTab.url);
         var domain = url.hostname;
-        var domain_splitted = domain.split(".")
-        var domain = domain_splitted.pop()
-        var domain = "." + domain_splitted.pop() + "." + domain
-        chrome.runtime.sendMessage({ action: 'enableSite', domain: domain });
+        chrome.runtime.sendMessage({ action: 'enableSite', domain: domain }, function (response) {
+            checkIfSiteAdded()
+        })
     });
 }
 
@@ -178,10 +174,9 @@ function disableSite(){
         var currentTab = tabs[0];
         var url = new URL(currentTab.url);
         var domain = url.hostname;
-        var domain_splitted = domain.split(".")
-        var domain = domain_splitted.pop()
-        var domain = "." + domain_splitted.pop() + "." + domain
-        chrome.runtime.sendMessage({ action: 'disableSite', domain: domain });
+        chrome.runtime.sendMessage({ action: 'disableSite', domain: domain }, function (response) {
+            checkIfSiteAdded()
+        });
     });
 }
 
@@ -205,7 +200,7 @@ function renderEnableSiteHTML(is_clickable){
     elementToStart.replaceChildren();
     elementToStart.innerHTML += enableSite_html;
     var button = document.getElementById("enableSite");
-    button.addEventListener("click", enableSite)
+    button.addEventListener("click", enableSite);
     if (!is_clickable){
         button.classList.add("no-click");
         button.insertAdjacentHTML("beforebegin",non_clickable_html);
@@ -217,7 +212,7 @@ function renderDisableSiteHTML(is_clickable){
     elementToStart.replaceChildren();
     elementToStart.innerHTML += disableSite_html;
     var button = document.getElementById("disableSite");
-    button.addEventListener("click", disableSite)
+    button.addEventListener("click", disableSite);
     if (!is_clickable){
        button.classList.add("no-click");
        button.insertAdjacentHTML("beforebegin",non_clickable_html);
@@ -225,5 +220,14 @@ function renderDisableSiteHTML(is_clickable){
 }
 
 function removeSiteEnablingError(){
-    document.getElementById("site-enabling-error").remove()
+    document.getElementById("site-enabling-error").remove();
+    var button = document.getElementById("enableSite");
+
+    if (button)
+        button.classList.remove("no-click");
+
+    var button = document.getElementById("disableSite");
+
+    if (button)
+        button.classList.remove("no-click");
 }

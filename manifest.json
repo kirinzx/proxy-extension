@@ -30,7 +30,7 @@
         {
             "all_frames": true,
             "matches": [
-                "https://proxy6.net/user/proxy"
+                "<all_urls>"
             ],
             "js": [
                 "content.js"
